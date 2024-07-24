@@ -21,7 +21,6 @@ public class LaberintoGui extends JFrame {
     private int altura;
     private int anchura;
     private boolean[][] grid;
-    private Laberinto laberinto;
     private JButton btnGenerar;
     private JButton btnRecursivo;
     private JButton btnCache;
