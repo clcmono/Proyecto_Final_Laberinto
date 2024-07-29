@@ -6,16 +6,22 @@ import Vista.LaberintoGui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.*;
 
 public class LaberintoControlador {
     private Laberinto laberinto;
     private LaberintoGui vista;
+    Vector<String> tiempo= new Vector<>();
 
     public LaberintoControlador(Laberinto laberinto, LaberintoGui vista) {
         this.laberinto = laberinto;
         this.vista = vista;
+       
 
         vista.addGenerarLaberintoListener(new ActionListener() {
             @Override
@@ -65,7 +71,7 @@ public class LaberintoControlador {
             laberinto.setFin(new Celda(finX, finY));
 
             List<Celda> solucion = null;
-            long inicioTiempo = System.currentTimeMillis();
+            long inicioTiempo = System.nanoTime();
 
             switch (metodo) {
                 case "Recursivo Simple":
@@ -82,18 +88,39 @@ public class LaberintoControlador {
                     break;
             }
 
-            long tiempoTotal = System.currentTimeMillis() - inicioTiempo;
+            DecimalFormat df = new DecimalFormat("#.##########");
+            String tiempoTotal = df.format((System.nanoTime() - inicioTiempo) / 1_000_000_000.0);
 
             if (solucion != null) {
+                
                 for (Celda celda : solucion) {
-                    vista.colorearCelda(celda.getRow(), celda.getCol(), Color.GREEN);
+                    if (vista.isDelayEnabled()) {
+                        try {
+                            TimeUnit.SECONDS.sleep(1);
+                                    
+                                    
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        vista.colorearCelda(celda.getRow(), celda.getCol(), Color.GREEN);
+                    }
+                    
+                            
+                    
                 }
-                vista.mostrarResultado("Solución encontrada en " + metodo + " en " + tiempoTotal + " ms");
+                
+                vista.mostrarResultado("Ruta: " + laberinto.path);
             } else {
                 vista.mostrarResultado("No se encontró solución en " + metodo);
             }
 
-            vista.mostrarTiempo(String.valueOf(tiempoTotal) + " ms");
+            // Acumulación de tiempos
+        
+            tiempo.add(metodo + ": " + tiempoTotal + " s \n");
+            System.err.println(tiempoTotal);
+            // vista.mostrarTiempo(tiempoTotal.toString());
+            vista.mostrarTiemposAnterior(tiempo.toString());
+
         } catch (NumberFormatException e) {
             vista.mostrarResultado("Por favor, ingrese números válidos para las coordenadas.");
         }

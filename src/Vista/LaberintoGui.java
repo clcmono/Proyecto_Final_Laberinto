@@ -1,8 +1,8 @@
 package Vista;
-
-import Modelo.Laberinto;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.*;
 
 public class LaberintoGui extends JFrame {
@@ -16,6 +16,7 @@ public class LaberintoGui extends JFrame {
     private JTextField txtFinY;
     private JTextField txtResultado;
     private JTextField txtTiempo;
+    private JTextArea txtTiempoAnterior;
     private JPanel laberintoPanel;
     private JButton[][] botones;
     private int altura;
@@ -26,6 +27,8 @@ public class LaberintoGui extends JFrame {
     private JButton btnCache;
     private JButton btnBFS;
     private JButton btnDFS;
+    private JButton btnLimpiarRecorrido; 
+    private JCheckBox cbDelay;
 
     public LaberintoGui() {
         setTitle("Laberinto");
@@ -35,7 +38,7 @@ public class LaberintoGui extends JFrame {
         contentPane.setLayout(new BorderLayout(10, 10));
         setContentPane(contentPane);
 
-        // Titulo
+        // Título
         JLabel lblTitulo = new JLabel("Laberinto");
         lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(lblTitulo, BorderLayout.NORTH);
@@ -72,6 +75,17 @@ public class LaberintoGui extends JFrame {
         gbc.gridx = 4;
         gbc.gridy = 0;
         topPanel.add(btnGenerar, gbc);
+
+        btnLimpiarRecorrido = new JButton("Limpiar Recorrido"); 
+        gbc.gridx = 5;
+        gbc.gridy = 0;
+        topPanel.add(btnLimpiarRecorrido, gbc);
+
+        cbDelay = new JCheckBox("Delay ");
+        gbc.gridx = 5;
+        gbc.gridy = 1;
+        topPanel.add(cbDelay, gbc);
+
 
         JLabel lblInicioX = new JLabel("Inicio X:");
         gbc.gridx = 0;
@@ -162,19 +176,35 @@ public class LaberintoGui extends JFrame {
         gbc.gridwidth = 2;
         bottomPanel.add(txtResultado, gbc);
 
-        JLabel lblTiempo = new JLabel("Tiempo:");
+        // JLabel lblTiempo = new JLabel("Tiempo:");
+        // gbc.gridx = 0;
+        // gbc.gridy = 2;
+        // bottomPanel.add(lblTiempo, gbc);
+
+        // txtTiempo = new JTextField();
+        // txtTiempo.setColumns(20);
+        // gbc.gridx = 1;
+        // gbc.gridy = 2;
+        // gbc.gridwidth = 2;
+        // bottomPanel.add(txtTiempo, gbc);
+
+        JLabel lblTiempoAnterior = new JLabel("Tiempos:");
         gbc.gridx = 0;
         gbc.gridy = 2;
-        bottomPanel.add(lblTiempo, gbc);
+        gbc.gridwidth = 2;
+        bottomPanel.add(lblTiempoAnterior, gbc);
 
-        txtTiempo = new JTextField();
-        txtTiempo.setColumns(20);
+        txtTiempoAnterior = new JTextArea();
+        txtTiempoAnterior.setColumns(20);
         gbc.gridx = 1;
         gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        bottomPanel.add(txtTiempo, gbc);
+        gbc.gridwidth = 3;
+        bottomPanel.add(txtTiempoAnterior, gbc);
 
         contentPane.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Listener para el botón "Limpiar Recorrido"
+        btnLimpiarRecorrido.addActionListener(e -> limpiarRecorrido());
     }
 
     public void addGenerarLaberintoListener(ActionListener listener) {
@@ -225,6 +255,11 @@ public class LaberintoGui extends JFrame {
         return botones;
     }
 
+    // Añadir este método para obtener el estado del checkbox
+    public boolean isDelayEnabled() {
+        return cbDelay.isSelected();
+    }
+
     public void generarLaberinto() {
         try {
             altura = getAltura();
@@ -265,10 +300,36 @@ public class LaberintoGui extends JFrame {
     }
 
     public void colorearCelda(int row, int col, Color color) {
-        botones[row][col].setBackground(color);
+        if (isDelayEnabled()) {
+            // try {
+            //     TimeUnit.SECONDS.sleep(1);
+                        
+                        
+            // } catch (InterruptedException e) {
+            //     Thread.currentThread().interrupt();
+            // }
+            botones[row][col].setBackground(color);
+        }
+        
+
     }
+
     public void mostrarTiempo(String tiempo) {
         txtTiempo.setText(tiempo);
     }
 
+    public void mostrarTiemposAnterior(String tiempo) {
+        txtTiempoAnterior.setText(tiempo);
+    }
+
+
+    public void limpiarRecorrido() {
+        for (int i = 0; i < altura; i++) {
+            for (int j = 0; j < anchura; j++) {
+                if (botones[i][j].getBackground() != Color.RED) {
+                    botones[i][j].setBackground(Color.WHITE);
+                }
+            }
+        }
+    }
 }
